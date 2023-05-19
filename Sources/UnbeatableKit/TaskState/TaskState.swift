@@ -149,5 +149,18 @@ extension Optional where Wrapped: _TaskState {
     }
 }
 
-extension TaskState: Equatable where Success: Equatable, Failure: Equatable {}
+extension TaskState: Equatable where Success: Equatable {
+    public static func == (lhs: TaskState<Success, Failure>, rhs: TaskState<Success, Failure>) -> Bool {
+        switch (lhs, rhs) {
+        case (.inProgress, .inProgress):
+            return true
+        case (.finished(.success(let lhsResult)), .finished(.success(let rhsResult))):
+            return lhsResult == rhsResult
+        case (.finished(.failure(let lhsError)), .finished(.failure(let rhsError))):
+            return lhsError.localizedDescription == rhsError.localizedDescription
+        default:
+            return false
+        }
+    }
+}
 extension TaskState: Hashable where Success: Hashable, Failure: Hashable {}
